@@ -4,8 +4,39 @@ Apresentação interativa criada para um case de processo seletivo na área de c
 
 > Projeto de estudo, sem vínculo com o iFood. Os dados são os do enunciado do case e servem apenas para demonstração.
 
+## Prévia
+
+**Visão geral da carteira.** Números do mês, crescimento por alavanca e leitura rápida logo na abertura.
+
+![Visão geral da carteira](docs/img/01-carteira.png)
+
+**Tabela e ficha do restaurante.** Filtros, barras de variação e as etiquetas de cada alavanca. Ao clicar em um restaurante, a ficha mostra o antes e o depois, a causa provável e a ação sugerida.
+
+![Tabela da carteira e ficha do restaurante](docs/img/02-tabela-ficha.png)
+
+**Simulador do plano de +15%.** Três controles, cenários prontos e a barra de progresso até a meta.
+
+![Simulador do plano de +15%](docs/img/03-simulador.png)
+
+**Funil de vendas.** Taxa de cada etapa, traço do período anterior e simulador de ganhos.
+
+![Funil de vendas](docs/img/04-funil.png)
+
+**Mercado por culinária.** Aqui na visão de pedidos por parceiro, que mostra onde há espaço e onde há disputa.
+
+![Mercado por culinária](docs/img/05-mercado.png)
+
+**Maquinona e Totem.** Calculadora de abordagens, aqui com a conversão reduzida a 25% para testar um cenário pior.
+
+![Calculadora de Maquinona e Totem](docs/img/06-maquinona-totem.png)
+
+**No celular.** O layout se adapta a telas estreitas.
+
+<img src="docs/img/07-celular.png" alt="Painel no celular" width="320">
+
 ## Sumário
 
+- [Prévia](#prévia)
 - [Para que serve](#para-que-serve)
 - [Como abrir](#como-abrir)
 - [Como navegar](#como-navegar)
