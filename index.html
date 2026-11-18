@@ -1,0 +1,574 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Case iFood Farmer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: cabeçalho fixo com cinco abas; cada aba é um painel de leitura + um controle que o leitor mexe. Vermelho da marca só no cromo; dados usam azul (alta) e laranja (queda). */
+:root{
+  --bg:#F5F3F0; --surface:#FFFFFF; --surface2:#FAF8F6; --ink:#1D1B19; --ink2:#4F4B47; --muted:#6B6661; --line:#E3DFDA; --track:#ECE8E3;
+  --brand:#EA1D2C; --brand-ink:#FFFFFF;
+  --up:#2563D6; --up-ink:#1B4FB0; --up-soft:#DCE8FB;
+  --down:#D95F0E; --down-ink:#A9440A; --down-soft:#FBE5D6;
+  --neutral:#8F8A84; --seg1:#1E4FAF; --seg2:#5B8DE0; --seg3:#A9C4F2;
+  --f-head:'Montserrat','Segoe UI',system-ui,sans-serif; --f-body:'Nunito Sans','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141312; --surface:#1E1C1A; --surface2:#262321; --ink:#F3F0EC; --ink2:#C4BEB8; --muted:#A09A93; --line:#37332F; --track:#2E2B28;
+  --brand:#EA1D2C; --up:#6FA3FF; --up-ink:#8DB6FF; --up-soft:#1C2E4F; --down:#FF9A5A; --down-ink:#FFA970; --down-soft:#4A2C18;
+  --neutral:#8F8A84; --seg1:#3E78E0; --seg2:#6FA3FF; --seg3:#B3CDFF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141312; --surface:#1E1C1A; --surface2:#262321; --ink:#F3F0EC; --ink2:#C4BEB8; --muted:#A09A93; --line:#37332F; --track:#2E2B28;
+  --brand:#EA1D2C; --up:#6FA3FF; --up-ink:#8DB6FF; --up-soft:#1C2E4F; --down:#FF9A5A; --down-ink:#FFA970; --down-soft:#4A2C18;
+  --neutral:#8F8A84; --seg1:#3E78E0; --seg2:#6FA3FF; --seg3:#B3CDFF; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+h1,h2,h3{font-family:var(--f-head);text-wrap:balance;margin:0;line-height:1.2}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--up);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1180px;margin:0 auto}
+.num{font-variant-numeric:tabular-nums}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) ;padding-inline:max(16px,env(safe-area-inset-left,0px))}
+.top-in{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-block:12px 0}
+.brandrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.brandrow h1{font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:10px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--brand);display:inline-block}
+.hint{color:var(--muted);font-size:.875rem}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font-family:var(--f-head);font-weight:700;font-size:.9rem;color:var(--muted);white-space:nowrap;border-radius:0}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+.tabs button:hover{color:var(--ink)}
+main{padding-block:28px 0}
+.panel{display:flex;flex-direction:column;gap:28px}
+.lead{max-width:68ch;color:var(--ink2)}
+.sec-title{font-size:1.35rem;font-weight:800}
+.sec-sub{color:var(--muted);max-width:70ch;margin-top:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+.grid{display:grid;gap:16px;min-width:0}
+.g4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.kpi .lab{color:var(--muted);font-size:.85rem;font-weight:600}
+.kpi .val{font-family:var(--f-head);font-weight:800;font-size:2rem;line-height:1.15;margin-top:2px}
+.kpi .sub{font-size:.875rem;color:var(--ink2);margin-top:4px}
+.up{color:var(--up-ink)} .dn{color:var(--down-ink)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg button,.btn{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:600;font-size:.875rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.toolbar input[type=search]{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:inherit;font-size:.875rem;min-width:0;width:180px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:.9rem;color:var(--ink2);max-width:60ch}
+.chk input{margin-top:5px;accent-color:var(--up)}
+/* barras de alavancas */
+.brow{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center;padding-block:7px}
+.brow .bl{font-weight:600;font-size:.9rem}
+.btrack{position:relative;height:14px;background:var(--track);border-radius:3px;min-width:0}
+.btrack i{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0;background:var(--up)}
+.bval{display:flex;gap:10px;align-items:baseline;margin-top:3px;font-size:.82rem;color:var(--muted)}
+.bval b{color:var(--ink);font-family:var(--f-head);font-size:.95rem}
+/* agenda */
+.tier h3{font-size:1rem;display:flex;gap:8px;align-items:center}
+.tier .why{color:var(--ink2);font-size:.9rem;margin:6px 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:4px 9px;font-size:.85rem;font-weight:600;display:inline-flex;gap:6px}
+button.chip:hover{border-color:var(--ink2)}
+.chip small{font-weight:700}
+.badge{display:inline-block;font-family:var(--f-head);font-weight:700;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--track);color:var(--ink2)}
+.badge.p1{background:var(--down-soft);color:var(--down-ink)} .badge.p2{background:var(--up-soft);color:var(--up-ink)}
+/* tabela */
+.tbl-split{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:1000px){.tbl-split{grid-template-columns:minmax(0,1fr)}.ficha{order:-1;position:static!important}}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);max-height:640px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;min-width:700px;font-size:.88rem}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--surface2);font-family:var(--f-head);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);z-index:1}
+th button{background:none;border:0;padding:0;font:inherit;text-transform:inherit;letter-spacing:inherit;color:inherit;font-weight:700}
+th[aria-sort="ascending"] button::after{content:" ↑"} th[aria-sort="descending"] button::after{content:" ↓"}
+td.r,th.r{text-align:right}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface2)}
+tbody tr.sel{background:var(--up-soft)}
+.nm{background:none;border:0;padding:0;font-weight:700}
+.dvb{position:relative;height:12px;width:150px}
+.dvb::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--neutral)}
+.dvb i{position:absolute;top:1px;bottom:1px}
+.dvb .neg{right:50%;background:var(--down);border-radius:4px 0 0 4px}
+.dvb .pos{left:50%;background:var(--up);border-radius:0 4px 4px 0}
+.st{font-size:.75rem;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--track);color:var(--ink2)}
+.st.off{background:var(--down-soft);color:var(--down-ink)} .st.on{background:var(--up-soft);color:var(--up-ink)} .st.none{background:transparent;color:var(--muted);font-weight:600}
+.ficha{position:sticky;top:130px;display:flex;flex-direction:column;gap:14px}
+.ficha h3{font-size:1.2rem}
+.pair{display:grid;grid-template-columns:78px 1fr;gap:4px 10px;align-items:center;font-size:.82rem}
+.pair .t{color:var(--muted);font-weight:600}
+.mini{position:relative;height:10px;background:var(--track);border-radius:3px}
+.mini i{position:absolute;left:0;top:0;bottom:0;border-radius:0 3px 3px 0}
+.mini .a{background:var(--neutral)} .mini .n{background:var(--up)}
+.pairhead{font-family:var(--f-head);font-weight:700;font-size:.82rem;margin-top:6px}
+.note{font-size:.88rem;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.warn{border-color:var(--down);}
+/* simulador */
+.sl{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:4px 12px;align-items:center}
+.sl label{grid-column:1/-1;font-weight:700;font-size:.92rem}
+.sl label span{font-weight:400;color:var(--muted)}
+.sl input[type=range]{width:100%;accent-color:var(--up)}
+.sl output{font-family:var(--f-head);font-weight:800;text-align:right}
+.stack{position:relative;height:30px;background:var(--track);border-radius:6px;overflow:hidden;display:flex;gap:2px}
+.stack i{display:block;height:100%}
+.metaline{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--ink)}
+.stackwrap{position:relative;padding-block:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.85rem;color:var(--ink2)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.big{font-family:var(--f-head);font-weight:800;font-size:1.6rem}
+.res{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline}
+/* funil */
+.frow{display:grid;grid-template-columns:110px 1fr 140px;gap:12px;align-items:center;padding-block:8px}
+@media (max-width:560px){.frow{grid-template-columns:90px 1fr}.frow .fv{grid-column:1/-1;margin-top:-4px}.brow{grid-template-columns:1fr}}
+.ftrack{position:relative;height:30px;background:var(--track);border-radius:4px}
+.ftrack i.bar{position:absolute;left:0;top:0;bottom:0;background:var(--up);border-radius:0 4px 4px 0}
+.ftrack i.tick{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--ink)}
+.fv b{font-family:var(--f-head);display:block}
+.fv small{color:var(--muted)}
+/* mercado */
+.mrow{display:grid;grid-template-columns:140px 1fr 230px;gap:12px;align-items:center;padding-block:5px;font-size:.9rem}
+@media (max-width:560px){.mrow{grid-template-columns:110px 1fr}.mrow .mv{grid-column:1/-1;margin-top:-2px}}
+.mrow .mn{font-weight:700}
+.mtrack{height:16px;background:var(--track);border-radius:3px;position:relative}
+.mtrack i{position:absolute;left:0;top:0;bottom:0;background:var(--up);border-radius:0 4px 4px 0}
+.mtrack.zero i{background:var(--down)}
+.mv{color:var(--ink2)} .mv b{color:var(--ink);font-family:var(--f-head)}
+.tag{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:5px;margin-left:6px;background:var(--track);color:var(--ink2)}
+.tag.o{background:var(--down-soft);color:var(--down-ink)} .tag.b{background:var(--up-soft);color:var(--up-ink)}
+/* expansão */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.calc .sl{grid-template-columns:minmax(0,1fr) 56px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.flow .card{padding:16px}
+.week{border-left:4px solid var(--brand);border-radius:6px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+summary{font-family:var(--f-head);font-weight:700;cursor:pointer}
+details[open] summary{margin-bottom:10px}
+details ol,details ul,.card ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:8px}
+#tip{position:fixed;z-index:20;background:var(--ink);color:var(--bg);padding:6px 10px;border-radius:8px;font-size:.8rem;max-width:260px;pointer-events:none;display:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:no-preference){.btrack i,.mtrack i,.ftrack i.bar,.stack i{transition:width .35s ease}}
+</style>
+
+<header class="top"><div class="top-in">
+  <div class="brandrow">
+    <h1><span class="dot" aria-hidden="true"></span>Case iFood · Executivo de Vendas Farmer</h1>
+    <p class="hint">Clique nos restaurantes, mexa nos controles e veja o efeito nos números.</p>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Seções do case">
+    <button role="tab" id="tab-carteira" aria-controls="p-carteira" aria-selected="true" data-tab="carteira">1 · Carteira</button>
+    <button role="tab" id="tab-funil" aria-controls="p-funil" aria-selected="false" data-tab="funil">2 · Funil</button>
+    <button role="tab" id="tab-mercado" aria-controls="p-mercado" aria-selected="false" data-tab="mercado">3 · Mercado</button>
+    <button role="tab" id="tab-expansao" aria-controls="p-expansao" aria-selected="false" data-tab="expansao">4 · Maquinona e Totem</button>
+    <button role="tab" id="tab-postura" aria-controls="p-postura" aria-selected="false" data-tab="postura">5 · Quick questions</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<!-- ============ CARTEIRA ============ -->
+<section class="panel" id="p-carteira" role="tabpanel" aria-labelledby="tab-carteira">
+  <div>
+    <h2 class="sec-title">Como está a carteira e quem atender primeiro</h2>
+    <p class="sec-sub">55 restaurantes, dois meses de pedidos e o uso de três alavancas: Frete Grátis, Cupom e promoções PBB.</p>
+  </div>
+  <label class="chk" for="dedup"><input type="checkbox" id="dedup"><span>Tratar linhas idênticas como repetidas. Os pares G/M, S/X, AG/AN e AI/AQ têm os mesmos pedidos nos dois meses. Marcado, remove M, X, AN e AQ de todos os números desta aba.</span></label>
+
+  <div class="grid g4" id="kpis" aria-live="polite"></div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3>Crescimento por alavanca</h3>
+      <p class="hint" style="margin-bottom:6px">Variação do mês atual sobre o anterior, em pedidos. Um pedido pode usar mais de uma alavanca.</p>
+      <div id="levers"></div>
+    </div>
+    <div class="card" id="insights"></div>
+  </div>
+
+  <div>
+    <h2 class="sec-title">Agenda de consultorias do próximo mês</h2>
+    <p class="sec-sub">Três faixas de prioridade. Clique em um restaurante para abrir a ficha dele logo abaixo.</p>
+  </div>
+  <div class="grid g3" id="agenda"></div>
+
+  <div id="tabela-top" style="display:flex;flex-direction:column;gap:12px">
+    <div class="toolbar">
+      <div class="seg" id="filters" role="group" aria-label="Filtrar restaurantes"></div>
+      <input type="search" id="q" placeholder="Buscar restaurante" aria-label="Buscar restaurante">
+    </div>
+    <p class="hint" id="count"></p>
+    <div class="tbl-split">
+      <div class="scroll"><table>
+        <thead><tr>
+          <th aria-sort="none"><button data-sort="n">Restaurante</button></th>
+          <th class="r" aria-sort="none"><button data-sort="at">Pedidos</button></th>
+          <th aria-sort="ascending"><button data-sort="g">Variação no mês</button></th>
+          <th>Frete Grátis</th><th>Cupom</th><th>PBB</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table></div>
+      <aside class="card ficha" id="ficha" aria-live="polite"></aside>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="sec-title">Plano para crescer 15% em pedidos</h2>
+    <p class="sec-sub">Três frentes sobre grupos de restaurantes definidos pelos dados. Os percentuais são hipóteses para discutir, ajuste e veja se a meta fecha.</p>
+  </div>
+  <div class="grid g2">
+    <div class="card" style="display:flex;flex-direction:column;gap:16px">
+      <div class="seg" id="presets" role="group" aria-label="Cenários">
+        <button data-p="0">Conservador</button><button data-p="1" aria-pressed="true">Base</button><button data-p="2">Agressivo</button>
+      </div>
+      <div class="sl"><label for="s1">1 · Recuperar contas em queda <span id="g1"></span></label><input type="range" id="s1" min="0" max="100" step="5"><output id="o1"></output></div>
+      <div class="sl"><label for="s2">2 · Testar PBB em contas grandes sem PBB <span id="g2"></span></label><input type="range" id="s2" min="0" max="30" step="1"><output id="o2"></output></div>
+      <div class="sl"><label for="s3">3 · Escalar contas que já crescem <span id="g3"></span></label><input type="range" id="s3" min="0" max="25" step="1"><output id="o3"></output></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px" aria-live="polite">
+      <div class="res"><span class="big num" id="simTot"></span><span id="simMsg"></span></div>
+      <div class="stackwrap"><div class="stack" id="stack"></div><div class="metaline" id="metaline" title="Meta de +15%"></div></div>
+      <div class="legend" id="simLeg"></div>
+      <p class="hint" id="simNote"></p>
+    </div>
+  </div>
+
+  <details>
+    <summary>Pontos de atenção nos dados</summary>
+    <ul id="dataNotes"></ul>
+  </details>
+  <div class="pager"><span></span><button class="btn primary" data-go="funil">Próximo: funil de vendas</button></div>
+</section>
+
+<!-- ============ FUNIL ============ -->
+<section class="panel" id="p-funil" role="tabpanel" aria-labelledby="tab-funil" hidden>
+  <div>
+    <h2 class="sec-title">Funil de vendas de uma loja</h2>
+    <p class="sec-sub">Um mês completo. A barra mostra a taxa sobre as visitas e o traço escuro marca a taxa do período anterior.</p>
+  </div>
+  <div class="card" id="funnel"></div>
+  <div class="grid g2">
+    <div class="card"><h3>O que o funil mostra</h3><ul style="margin-top:10px" id="funInsights"></ul></div>
+    <div class="card"><h3>O que orientar ao parceiro</h3><ul style="margin-top:10px">
+      <li><b>Vitrine:</b> subir categorias que vendem (Mais Pedidos, Promoção do Dia, Combos), fotos reais e descrições que dão vontade de pedir.</li>
+      <li><b>Revisão do pedido:</b> teste A/B de cupom de primeira compra ou frete grátis por tempo limitado para quem chegou até a revisão.</li>
+      <li><b>Ticket:</b> sugerir adicionais na sacola, como uma bebida por R$ 5, para compensar o custo da condição.</li>
+      <li><b>Acompanhamento:</b> rever o funil toda semana e medir cada ação isolada.</li>
+    </ul></div>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;gap:16px">
+    <div><h3>E se o parceiro melhorar o funil?</h3><p class="hint">As demais taxas ficam como estão hoje.</p></div>
+    <div class="grid g2">
+      <div class="sl"><label for="fa">Mais visitas que viram visualização <span>(hoje 44,97%)</span></label><input type="range" id="fa" min="0" max="10" step="0.5" value="0"><output id="fao"></output></div>
+      <div class="sl"><label for="fb">Parte dos 420 que abandonam na revisão e voltam a comprar</label><input type="range" id="fb" min="0" max="50" step="5" value="0"><output id="fbo"></output></div>
+    </div>
+    <div class="res" aria-live="polite"><span class="big num" id="fRes"></span><span id="fMsg"></span></div>
+  </div>
+  <div class="pager"><button class="btn" data-go="carteira">Voltar: carteira</button><button class="btn primary" data-go="mercado">Próximo: mercado</button></div>
+</section>
+
+<!-- ============ MERCADO ============ -->
+<section class="panel" id="p-mercado" role="tabpanel" aria-labelledby="tab-mercado" hidden>
+  <div>
+    <h2 class="sec-title">Mercado de Foodlandia e a carteira</h2>
+    <p class="sec-sub">Pedidos por culinária na cidade, cruzados com quantos parceiros a carteira tem em cada uma. Os parceiros por culinária vêm do gráfico da pergunta 3, que soma 96 parceiros. A planilha da pergunta 1 tem 55 restaurantes, então as duas carteiras não são a mesma. Outras 19 lojas do gráfico (Pastel, Contemporânea, Cafeteria etc.) são de culinárias que a tabela da cidade não traz.</p>
+  </div>
+  <div class="toolbar"><div class="seg" id="mseg" role="group" aria-label="Métrica do gráfico">
+    <button data-m="city" aria-pressed="true">Pedidos na cidade</button>
+    <button data-m="par">Parceiros na carteira</button>
+    <button data-m="per">Pedidos por parceiro</button></div></div>
+  <div class="card" id="mchart"></div>
+  <p class="hint" id="mnote"></p>
+  <div class="grid g3" id="mcards"></div>
+  <div class="pager"><button class="btn" data-go="funil">Voltar: funil</button><button class="btn primary" data-go="expansao">Próximo: Maquinona e Totem</button></div>
+</section>
+
+<!-- ============ EXPANSÃO ============ -->
+<section class="panel" id="p-expansao" role="tabpanel" aria-labelledby="tab-expansao" hidden>
+  <div>
+    <h2 class="sec-title">Captar Maquinona e Totem de Autoatendimento</h2>
+    <p class="sec-sub">Metas do mês e a conversão de referência do enunciado. Mude os valores para ver quantas abordagens a rotina precisa comportar.</p>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;gap:18px">
+    <div class="calc">
+      <div class="sl"><label for="e1">Meta de Maquinona</label><input type="range" id="e1" min="1" max="20" step="1" value="9"><output id="e1o"></output></div>
+      <div class="sl"><label for="e2">Meta de Totem</label><input type="range" id="e2" min="1" max="20" step="1" value="7"><output id="e2o"></output></div>
+      <div class="sl"><label for="e3">Conversão por abordagem</label><input type="range" id="e3" min="10" max="60" step="1" value="33"><output id="e3o"></output></div>
+      <div class="sl"><label for="e4">Dias úteis no mês</label><input type="range" id="e4" min="15" max="23" step="1" value="22"><output id="e4o"></output></div>
+    </div>
+    <div class="flow" aria-live="polite" id="eflow"></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Maquinona</h3><ul style="margin-top:10px">
+      <li><b>Quem abordar:</b> restaurantes com muito pedido no salão, como pizzarias e comida brasileira.</li>
+      <li><b>Argumento:</b> um caixa só para balcão e iFood, menos conciliação e uma calculadora que compara a taxa atual com a nossa.</li></ul></div>
+    <div class="card"><h3>Totem</h3><ul style="margin-top:10px">
+      <li><b>Quem abordar:</b> lanches, hambúrguer, açaí e pastel, onde há balcão e fila.</li>
+      <li><b>Argumento:</b> ticket maior com sugestão de bebida e sobremesa, e menos gente no atendimento.</li></ul></div>
+  </div>
+  <div class="grid g4">
+    <div class="card week"><h3>Semanas 1 e 2</h3><p class="hint" style="margin-top:6px">Gerar demanda: pitch de cinco minutos no fim das consultorias de GMV e lista de quem tem fila ou salão cheio.</p></div>
+    <div class="card week"><h3>Semana 3</h3><p class="hint" style="margin-top:6px">Propostas com ROI: comparar a maquininha atual do parceiro com a Maquinona.</p></div>
+    <div class="card week"><h3>Semana 4</h3><p class="hint" style="margin-top:6px">Fechamento: retornar a todos que receberam proposta.</p></div>
+    <div class="card week"><h3>Ferramentas</h3><p class="hint" style="margin-top:6px">Funil no CRM (prospecção, apresentação, negociação, fechamento), calculadora de ROI e base de pedidos para escolher alvos.</p></div>
+  </div>
+  <div class="pager"><button class="btn" data-go="mercado">Voltar: mercado</button><button class="btn primary" data-go="postura">Próximo: quick questions</button></div>
+</section>
+
+<!-- ============ POSTURA ============ -->
+<section class="panel" id="p-postura" role="tabpanel" aria-labelledby="tab-postura" hidden>
+  <div>
+    <h2 class="sec-title">Postura e relacionamento</h2>
+    <p class="sec-sub">Três situações do dia a dia. Abra cada uma para ver a resposta em passos.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <details open><summary>1 · Parceiro pede dados estratégicos dos concorrentes</summary><ol>
+      <li>Recusar com educação e explicar que o sigilo dos dados é o que sustenta a confiança de todos os parceiros.</li>
+      <li>Oferecer o que pode ser dito: tendências agregadas e anônimas da praça, como categorias em alta e horários de pico.</li>
+      <li>Trazer a conversa para os dados da própria loja, onde há decisão para tomar.</li></ol></details>
+    <details><summary>2 · Feedback do gestor: meta não batida e pares com alto atingimento</summary><ol>
+      <li>Ouvir sem defensiva e pedir exemplos concretos.</li>
+      <li>Comparar minha carteira com a de quem bate a meta: quais alavancas usam, em que ordem atendem.</li>
+      <li>Pedir para acompanhar uma consultoria de um colega e montar um plano de 15 dias nas contas de maior potencial, com revisão semanal.</li></ol></details>
+    <details><summary>3 · Parceiro importante cresce todo mês e mesmo assim reclama</summary><ol>
+      <li>Escutar até entender a origem da frustração: posicionamento, concorrência ou custo.</li>
+      <li>Mostrar o crescimento de pedidos e faturamento em um painel simples, mês a mês.</li>
+      <li>Levar a energia para o que ele controla, como tempo de entrega, avaliação e Selo Super, e combinar um próximo passo com data.</li></ol></details>
+  </div>
+  <div class="pager"><button class="btn" data-go="expansao">Voltar: Maquinona e Totem</button><button class="btn primary" data-go="carteira">Voltar ao início</button></div>
+</section>
+</main>
+<div id="tip" role="tooltip"></div>
+
+<script>
+/* Dados: aba "Carteira" da planilha do case. Cada linha: nome, pedidos mês atual, mês anterior, variação, Frete atual/anterior, Cupom atual/anterior, PBB atual/anterior. */
+const RAW=[["A",884,1216,-332,363,577,0,240,0,288],["B",390,616,-226,0,277,98,154,2,12],["C",136,274,-138,59,132,0,98,0,140],["D",238,374,-136,0,168,41,118,28,62],["E",224,346,-122,0,156,4,18,0,2],["F",2940,2244,696,1411,1010,866,676,922,984],["G",1408,920,488,676,414,0,0,0,0],["H",1044,592,452,501,266,183,83,78,22],["I",552,226,326,265,102,111,6,110,0],["J",342,18,324,164,8,31,1,18,0],["L",1616,1356,260,776,610,51,59,0,8],["M",1408,920,488,676,414,0,0,0,0],["N",388,816,-428,0,381,104,228,230,404],["O",282,460,-178,88,213,110,184,192,314],["P",360,510,-150,0,230,0,0,0,0],["Q",226,368,-142,0,166,16,0,26,0],["R",1190,460,730,505,212,0,0,0,0],["S",2084,1668,416,1380,751,408,115,0,0],["T",1254,938,316,602,422,421,244,614,68],["U",1270,964,306,610,434,186,171,188,192],["V",618,324,294,297,146,3,23,0,20],["X",2084,1668,416,1000,751,188,115,0,0],["Z",1470,1282,188,706,577,220,240,156,134],["AA",1428,1338,90,685,602,214,186,2,4],["AB",956,1110,-154,0,500,121,231,0,166],["AC",404,554,-150,0,249,85,179,30,106],["AD",592,728,-136,180,237,108,210,254,274],["AE",176,306,-130,0,138,0,0,0,0],["AF",1114,328,786,608,139,433,108,782,110],["AG",1646,1216,430,790,547,601,447,1092,774],["AH",850,486,364,378,227,0,0,0,0],["AI",1392,1038,354,668,467,0,0,0,0],["AJ",4682,4366,316,2247,1965,0,0,0,4],["AL",894,590,304,391,275,215,153,130,50],["AM",2930,2716,214,1406,1222,653,481,10,0],["AN",1646,1216,430,790,547,601,447,1092,774],["AO",1596,1380,216,766,621,358,337,468,252],["AP",1596,1536,60,766,691,215,235,68,62],["AQ",1392,1038,354,668,467,183,0,0,0],["AR",536,712,-176,214,320,0,13,0,18],["AS",622,764,-142,0,11,0,10,10,0],["AT",110,250,-140,41,117,0,65,0,0],["AU",702,840,-138,0,378,0,173,0,2],["AV",186,322,-136,0,85,42,52,12,2],["AX",586,716,-130,148,192,111,147,108,142],["AZ",1378,528,850,522,4,332,50,900,48],["BA",1078,454,624,483,3,292,168,272,206],["BB",702,386,316,437,174,187,0,46,0],["BC",2402,2324,78,1092,1156,549,576,854,884],["BD",1972,1862,110,1144,968,0,0,0,0],["BE",146,146,0,0,0,26,35,0,14],["BF",122,122,0,0,0,0,0,0,0],["BG",100,100,0,0,0,31,26,2,5],["BH",20,20,0,0,0,7,9,0,0],["BI",17,17,0,0,6,2,10,0,4]];
+const R=RAW.map(a=>({n:a[0],at:a[1],an:a[2],g:a[3],f:[a[4],a[5]],c:[a[6],a[7]],p:[a[8],a[9]]}));
+const MIRR=new Set(['M','X','AN','AQ']);
+const DUPS=new Set(['G','M','S','X','AG','AN','AI','AQ']);
+const STALE=new Set(['BE','BF','BG','BH','BI']);
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const fmt=n=>Math.round(n).toLocaleString('pt-BR');
+const sg=n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
+const dec=(x,d=1)=>Math.abs(x).toFixed(d).replace('.',',');
+const pc=(x,d=1)=>(x>0?'+':x<0?'−':'')+dec(x,d)+'%';
+const pl=(x,d=1)=>dec(x,d)+'%';
+const $=s=>document.querySelector(s);
+const S={dedup:false,filter:'all',q:'',sort:{k:'g',d:1},sel:'N',pre:1};
+const rows=()=>R.filter(r=>!(S.dedup&&MIRR.has(r.n)));
+const byName=n=>R.find(r=>r.n===n);
+const LEV=[['f','Frete Grátis'],['c','Cupom'],['p','PBB']];
+function status(l){const [a,b]=l;if(a===0&&b===0)return['Sem uso','none'];if(b===0)return['Ligou','on'];if(a===0)return['Desligou','off'];if(a>b)return['Subiu','on'];if(a<b)return['Caiu','off'];return['Igual',''];}
+const off=r=>LEV.filter(([k])=>r[k][1]>0&&r[k][0]===0).map(x=>x[1]);
+
+/* ---- tooltip ---- */
+const tip=$('#tip');
+document.addEventListener('pointerover',e=>{const t=e.target.closest('[data-tip]');if(!t){tip.style.display='none';return}tip.textContent=t.dataset.tip;tip.style.display='block'});
+document.addEventListener('pointermove',e=>{if(tip.style.display==='block'){tip.style.left=Math.min(e.clientX+14,innerWidth-270)+'px';tip.style.top=(e.clientY+16)+'px'}});
+
+/* ---- KPIs, alavancas, insights ---- */
+function renderKpis(){
+  const rs=rows(),at=sum(rs,r=>r.at),an=sum(rs,r=>r.an),g=at-an;
+  const dn=rs.filter(r=>r.g<0),up=rs.filter(r=>r.g>0);
+  const fOff=dn.filter(r=>off(r).includes('Frete Grátis'));
+  const top=[...rs].sort((a,b)=>b.at-a.at).slice(0,5);
+  $('#kpis').innerHTML=`
+   <div class="card kpi"><div class="lab">Pedidos no mês</div><div class="val num">${fmt(at)}</div><div class="sub up">${sg(g)} (${pc(g/an*100)}) sobre o mês anterior</div></div>
+   <div class="card kpi"><div class="lab">Contas em queda</div><div class="val num">${dn.length}</div><div class="sub dn">${sg(sum(dn,r=>r.g))} pedidos, ${fOff.length} delas desligaram o Frete Grátis</div></div>
+   <div class="card kpi"><div class="lab">Contas crescendo</div><div class="val num">${up.length}</div><div class="sub up">${sg(sum(up,r=>r.g))} pedidos</div></div>
+   <div class="card kpi"><div class="lab">Concentração</div><div class="val num">${pl(sum(top,r=>r.at)/at*100)}</div><div class="sub">dos pedidos vêm de 5 contas: ${top.map(r=>r.n).join(', ')}</div></div>`;
+  const L=[['Pedidos totais',an,at],['Com Frete Grátis',sum(rs,r=>r.f[1]),sum(rs,r=>r.f[0])],['Com Cupom',sum(rs,r=>r.c[1]),sum(rs,r=>r.c[0])],['Em PBB',sum(rs,r=>r.p[1]),sum(rs,r=>r.p[0])]];
+  const mx=Math.max(...L.map(l=>(l[2]/l[1]-1)*100))*1.08;
+  $('#levers').innerHTML=L.map(([n,a,b])=>{const v=(b/a-1)*100;return `<div class="brow"><div class="bl">${n}</div><div><div class="btrack" data-tip="${n}: ${fmt(a)} → ${fmt(b)}"><i style="width:${v/mx*100}%"></i></div><div class="bval"><b class="num">${pc(v)}</b><span class="num">${fmt(a)} → ${fmt(b)}</span></div></div></div>`}).join('');
+  const pb=L[3],fr=L[1];
+  const noPbbBig=rs.filter(r=>r.p[0]===0&&r.at>=500);
+  $('#insights').innerHTML=`<h3>Leitura rápida</h3><ul style="margin-top:10px">
+   <li><b class="up">Ponto positivo:</b> a carteira cresceu ${pl((at-an)/an*100)} e as promoções PBB cresceram mais que o volume (${pc((pb[2]/pb[1]-1)*100)}).</li>
+   <li><b class="dn">Ponto de atenção:</b> ${fOff.length} das ${dn.length} contas em queda tinham Frete Grátis no mês anterior e hoje não têm. Juntas perderam ${fmt(-sum(fOff,r=>r.g))} pedidos.</li>
+   <li><b>Oportunidade:</b> ${noPbbBig.length} contas com 500 pedidos ou mais não usam PBB. Somam ${fmt(sum(noPbbBig,r=>r.at))} pedidos.</li>
+   <li><b>Risco de dependência:</b> a maior conta (AJ, ${fmt(byName('AJ').at)} pedidos) não usa Cupom nem PBB.</li></ul>`;
+}
+
+/* ---- agenda ---- */
+function chip(r,extra){return `<button class="chip" data-sel="${r.n}">${r.n} <small class="${r.g<0?'dn':'up'} num">${extra}</small></button>`}
+function renderAgenda(){
+  const rs=rows();
+  const t1=rs.filter(r=>r.g<0).sort((a,b)=>a.g-b.g);
+  const t2=rs.filter(r=>r.g>=0&&r.p[0]===0&&r.at>=500).sort((a,b)=>b.at-a.at);
+  const t3=rs.filter(r=>r.g>0&&!t2.includes(r)).sort((a,b)=>b.g-a.g).slice(0,8);
+  $('#agenda').innerHTML=`
+   <div class="card tier"><h3><span class="badge p1">Prioridade 1</span>Recuperar</h3>
+     <p class="why">${t1.length} contas perderam pedidos. Reuniões curtas para mostrar a perda e simular o retorno de reativar a alavanca desligada.</p>
+     <div class="chips">${t1.map(r=>chip(r,sg(r.g))).join('')}</div></div>
+   <div class="card tier"><h3><span class="badge p2">Prioridade 2</span>Destravar volume</h3>
+     <p class="why">${t2.length} contas de alto volume, sem PBB e fora da lista de queda. Maior retorno por reunião, porque o ganho de poucos pontos percentuais já pesa.</p>
+     <div class="chips">${t2.map(r=>chip(r,fmt(r.at))).join('')}</div></div>
+   <div class="card tier"><h3><span class="badge">Prioridade 3</span>Escalar e proteger</h3>
+     <p class="why">Os ${t3.length} maiores crescimentos fora da prioridade 2. Acompanhar a margem e orientar para o Selo Super.</p>
+     <div class="chips">${t3.map(r=>chip(r,sg(r.g))).join('')}</div></div>`;
+}
+
+/* ---- tabela ---- */
+const FILTERS=[['all','Todos'],['dn','Em queda'],['up','Crescendo'],['flat','Sem variação'],['foff','Perdeu Frete Grátis'],['nopbb','≥500 pedidos sem PBB']];
+function matchF(r){switch(S.filter){case'dn':return r.g<0;case'up':return r.g>0;case'flat':return r.g===0;case'foff':return off(r).includes('Frete Grátis');case'nopbb':return r.p[0]===0&&r.at>=500;default:return true}}
+function renderFilters(){$('#filters').innerHTML=FILTERS.map(([k,l])=>`<button data-f="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join('')}
+function renderTable(){
+  let rs=rows().filter(matchF).filter(r=>r.n.toLowerCase().includes(S.q.toLowerCase()));
+  const {k,d}=S.sort;
+  rs.sort((a,b)=>k==='n'?d*a.n.localeCompare(b.n,'pt',{numeric:true}):d*(a[k]-b[k]));
+  const mx=Math.max(...rows().map(r=>Math.abs(r.g)));
+  $('#count').textContent=`${rs.length} de ${rows().length} restaurantes`;
+  document.querySelectorAll('th[aria-sort]').forEach(th=>{const kk=th.querySelector('button').dataset.sort;th.setAttribute('aria-sort',kk===k?(d>0?'ascending':'descending'):'none')});
+  $('#tbody').innerHTML=rs.map(r=>{
+    const w=Math.abs(r.g)/mx*50;
+    const bar=`<div class="dvb" data-tip="${r.n}: ${fmt(r.an)} → ${fmt(r.at)} (${sg(r.g)})">${r.g<0?`<i class="neg" style="width:${w}%"></i>`:r.g>0?`<i class="pos" style="width:${w}%"></i>`:''}</div>`;
+    const cells=LEV.map(([kk])=>{const [t,c]=status(r[kk]);return `<td><span class="st ${c}" data-tip="${fmt(r[kk][1])} → ${fmt(r[kk][0])} pedidos">${t}</span></td>`}).join('');
+    return `<tr data-sel="${r.n}" class="${S.sel===r.n?'sel':''}"><td><button class="nm">${r.n}</button>${DUPS.has(r.n)?' <span class="tag o" data-tip="Pedidos idênticos aos de outra linha">repetida?</span>':''}</td><td class="r num">${fmt(r.at)}</td><td><div style="display:flex;gap:10px;align-items:center">${bar}<span class="num ${r.g<0?'dn':r.g>0?'up':''}" style="min-width:56px">${sg(r.g)}</span></div></td>${cells}</tr>`}).join('')||'<tr><td colspan="6">Nenhum restaurante nesse filtro.</td></tr>';
+}
+function pairBars(t,a,b){const m=Math.max(a,b,1);return `<div class="pairhead">${t}</div><div class="pair"><span class="t">Anterior</span><div class="mini"><i class="a" style="width:${b/m*100}%"></i></div><span class="t">Atual</span><div class="mini"><i class="n" style="width:${a/m*100}%"></i></div></div><div class="hint num">${fmt(b)} → ${fmt(a)}</div>`}
+function renderFicha(){
+  const r=byName(S.sel)||rows()[0];
+  const ofs=off(r),pct=r.an?r.g/r.an*100:0;
+  const ons=LEV.filter(([k])=>r[k][0]>0&&r[k][1]===0).map(x=>x[1]);
+  const zero=LEV.filter(([k])=>r[k][0]===0).map(x=>x[1]);
+  const rise=LEV.filter(([k])=>r[k][0]>r[k][1]&&r[k][1]>0).map(([k,l])=>`${l} (${fmt(r[k][1])} → ${fmt(r[k][0])})`);
+  let head,cause,action;
+  if(r.g<0){head=`<span class="dn">Perdeu ${fmt(-r.g)} pedidos (${pc(pct)})</span>`;
+    const low=LEV.filter(([k])=>r[k][0]<r[k][1]&&r[k][0]>0).map(x=>x[1]);
+    cause=ofs.length?`Desligou ${ofs.join(' e ')}.`:low.length?`Reduziu ${low.join(' e ')}.`:'Nenhuma alavanca foi desligada. Vale investigar cardápio, preço e operação.';
+    action=ofs.length?`Reunião para mostrar a perda de pedidos e simular o retorno de reativar ${ofs.join(' e ')}.`:'Reunião de diagnóstico para entender o que mudou na operação.';}
+  else if(r.g>0){head=`<span class="up">Cresceu ${fmt(r.g)} pedidos (${pc(pct)})</span>`;
+    cause=ons.length||rise.length?`Alavancas em alta: ${[...ons.map(x=>x+' (ligou)'),...rise].join(', ')}.`:'Cresceu sem mudança relevante nas alavancas.';
+    action=r.at>=500&&zero.length?`Oportunidade: ainda sem ${zero.join(' e ')}. Testar com acompanhamento de margem.`:'Proteger a margem e orientar para o Selo Super.';}
+  else{head='Sem variação';cause='Pedidos idênticos nos dois meses.';action='Confirmar se os dados do restaurante foram atualizados antes de priorizar.';}
+  const flags=[];
+  if(DUPS.has(r.n))flags.push('Esta linha tem pedidos iguais aos de outra linha. Pode ser repetição na planilha.');
+  if(STALE.has(r.n))flags.push('Pedidos iguais nos dois meses, com alavancas diferentes. Pode ser dado parado.');
+  $('#ficha').innerHTML=`<div><span class="hint">Ficha do restaurante</span><h3>${r.n}</h3><p class="num" style="font-weight:700">${head}</p></div>
+   ${pairBars('Pedidos',r.at,r.an)}${LEV.map(([k,l])=>pairBars(l,r[k][0],r[k][1])).join('')}
+   <div class="note"><b>Causa provável.</b> ${cause}<br><b>Ação.</b> ${action}</div>
+   ${flags.map(f=>`<div class="note warn">${f}</div>`).join('')}`;
+}
+function select(n,scroll){S.sel=n;renderTable();renderFicha();if(scroll&&innerWidth<=1000)$('#ficha').scrollIntoView({behavior:'smooth',block:'center'});}
+
+/* ---- simulador de 15% ---- */
+const PRESETS=[[40,8,5],[65,15,12],[80,20,15]];
+function setPreset(i){S.pre=i;const p=PRESETS[i];['s1','s2','s3'].forEach((id,j)=>$('#'+id).value=p[j]);document.querySelectorAll('#presets button').forEach((b,j)=>b.setAttribute('aria-pressed',j===i));renderSim()}
+function renderSim(){
+  const rs=rows(),at=sum(rs,r=>r.at),meta=at*0.15;
+  const dn=rs.filter(r=>r.g<0),g2=rs.filter(r=>r.g>=0&&r.p[0]===0&&r.at>=500),g3=rs.filter(r=>r.g>0&&!g2.includes(r));
+  const b1=-sum(dn,r=>r.g),b2=sum(g2,r=>r.at),b3=sum(g3,r=>r.at);
+  const v=['s1','s2','s3'].map(id=>+$('#'+id).value);
+  v.forEach((x,i)=>$('#o'+(i+1)).textContent=x+'%');
+  $('#g1').textContent=`(${dn.length} contas, perda de ${fmt(b1)} pedidos)`;
+  $('#g2').textContent=`(${g2.length} contas, ${fmt(b2)} pedidos)`;
+  $('#g3').textContent=`(${g3.length} contas, ${fmt(b3)} pedidos)`;
+  const c=[b1*v[0]/100,b2*v[1]/100,b3*v[2]/100],tot=c[0]+c[1]+c[2];
+  const scale=Math.max(meta,tot)*1.06;
+  $('#stack').innerHTML=c.map((x,i)=>`<i style="width:${x/scale*100}%;background:var(--seg${i+1})" data-tip="Frente ${i+1}: ${sg(x)} pedidos"></i>`).join('');
+  $('#metaline').style.left=(meta/scale*100)+'%';
+  $('#simTot').textContent=sg(tot)+' pedidos';
+  const ok=tot>=meta;
+  $('#simMsg').innerHTML=ok?`<b class="up">Meta atingida</b>, ${pl(tot/meta*100,0)} dos ${fmt(meta)} pedidos necessários.`:`<b class="dn">Faltam ${fmt(meta-tot)} pedidos</b> para a meta de ${fmt(meta)} (${pl(tot/meta*100,0)} atingido).`;
+  $('#simLeg').innerHTML=c.map((x,i)=>`<span style="--c:var(--seg${i+1})">Frente ${i+1}: ${sg(x)}</span>`).join('')+`<span style="--c:var(--ink)">Meta: ${fmt(meta)}</span>`;
+  $('#simNote').textContent=`Meta de +15% sobre ${fmt(at)} pedidos. Os grupos não se sobrepõem, então os ganhos podem ser somados.`;
+}
+
+/* ---- notas sobre os dados ---- */
+function renderNotes(){
+  const mir=R.filter(r=>MIRR.has(r.n)),ma=sum(mir,r=>r.at),mb=sum(mir,r=>r.an);
+  const at=sum(R,r=>r.at),an=sum(R,r=>r.an);
+  $('#dataNotes').innerHTML=`
+   <li><b>Linhas que parecem repetidas.</b> G e M, e também AG e AN, são idênticas em todas as colunas. S e X, e também AI e AQ, têm os mesmos pedidos mas alavancas diferentes. Se M, X, AN e AQ forem repetição, saem ${fmt(ma)} pedidos do mês atual e ${fmt(mb)} do anterior, e o crescimento da carteira vai de ${pl((at-an)/an*100)} para ${pl(((at-ma)-(an-mb))/(an-mb)*100)}.</li>
+   <li><b>Restaurantes sem variação.</b> BE, BF, BG, BH e BI têm pedidos idênticos nos dois meses. Pode ser dado parado, vale confirmar antes de atender.</li>
+   <li><b>Casos de baixo volume.</b> Contas abaixo de 200 pedidos mudam pouco o total. Entram na agenda só se a queda tiver causa clara.</li>
+   <li><b>Meta de 15%.</b> No mês anterior a carteira cresceu ${pl((at-an)/an*100)} sem plano formal. A meta pede uma ação que sustente esse ritmo e não só repita a tendência.</li>`;
+}
+
+/* ---- funil ---- */
+const FN=[['Visitas',4078,100],['Visualizações',1834,48.24],['Sacola',1450,37.69],['Revisão',1450,37.62],['Concluídos',1030,27.33]];
+function renderFunnel(){
+  $('#funnel').innerHTML=FN.map(([n,c,pv],i)=>{const r=c/4078*100,d=r-pv;
+   return `<div class="frow"><div style="font-weight:700">${n}</div><div class="ftrack" data-tip="${n}: ${fmt(c)} sessões, ${pl(r,2)} das visitas${i?`; período anterior ${pl(pv,2)}`:''}"><i class="bar" style="width:${r}%"></i>${i?`<i class="tick" style="left:calc(${pv}% - 1px)"></i>`:''}</div><div class="fv"><b class="num">${fmt(c)} · ${pl(r,2)}</b>${i?`<small class="num ${d<0?'dn':'up'}">${d<0?'−':'+'}${dec(d,2)} pp vs anterior</small>`:'<small class="num up">+54,18% vs anterior</small>'}</div></div>`}).join('');
+  $('#funInsights').innerHTML=`<li><b>Tráfego subiu, conversão caiu.</b> As visitas cresceram 54,18%, mas a conversão final foi de 27,33% para 25,26%. São 2,07 pontos percentuais a menos, ou uma queda relativa de 7,57%, que é o número do painel do case.</li>
+   <li><b>Vitrine:</b> só 44,97% dos visitantes veem algum item, contra 48,24% antes.</li>
+   <li><b>Revisão:</b> a sacola chega inteira à revisão (1.450 e 1.450), mas 420 sessões abandonam antes de concluir. Concluem 71% de quem revisa.</li>
+   <li><b>Ameaça:</b> o parceiro paga para atrair visitas que não viram pedido.</li>`;
+}
+function renderFunWhat(){
+  const a=+$('#fa').value,b=+$('#fb').value;
+  $('#fao').textContent='+'+dec(a,1)+' pp';$('#fbo').textContent=b+'%';
+  const vr=1834/4078+a/100,s=1450/1834,cr=1030/1450,n=4078*vr*s*(cr+(1-cr)*b/100),d=n-1030;
+  $('#fRes').textContent=fmt(n)+' pedidos';
+  $('#fMsg').innerHTML=d>0.5?`<b class="up">${sg(d)} (${pc(d/1030*100)})</b> sobre os 1.030 de hoje. Conversão final de ${pl(n/4078*100,2)}.`:'Igual aos 1.030 de hoje. Mexa nos controles.';
+}
+
+/* ---- mercado ---- */
+const CITY=[['Lanches',152919,17],['Comida Brasileira',80397,17],['Pizza',66198,27],['Açaí',51106,3],['Marmita',22190,0],['Doces & Bolos',21536,0],['Bebidas',20694,0],['Comida Japonesa',17877,5],['Comida Saudável',14415,0],['Mercado',14350,0],['Carnes',11860,0],['Padaria',11834,1],['Hambúrguer',8443,4],['Comida Chinesa',7828,2],['Frutos do Mar',7670,0],['Comida Árabe',6691,0],['Comida Italiana',5197,1],['Conveniência',4111,0],['Sorvetes',3961,0]];
+let MM='city';
+function tagFor(c){const p=c[2];if(!p)return['sem parceiro','o'];const per=c[1]/p;if(per>=10000)return['espaço','b'];if(per<=2500)return['disputada','o'];return['',''];}
+function renderMarket(){
+  document.querySelectorAll('#mseg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===MM));
+  const val=c=>MM==='city'?c[1]:MM==='par'?c[2]:(c[2]?c[1]/c[2]:0);
+  const list=[...CITY].sort((a,b)=>val(b)-val(a)||b[1]-a[1]);
+  const mx=Math.max(...list.map(val));
+  $('#mchart').innerHTML=list.map(c=>{const v=val(c),[t,k]=tagFor(c),w=v/mx*100;
+   const txt=MM==='city'?`<b class="num">${fmt(c[1])}</b> pedidos`:MM==='par'?`<b class="num">${c[2]}</b> parceiros`:(c[2]?`<b class="num">${fmt(v)}</b> por parceiro`:'sem parceiro');
+   return `<div class="mrow"><div class="mn">${c[0]}</div><div class="mtrack ${c[2]?'':'zero'}" data-tip="${c[0]}: ${fmt(c[1])} pedidos na cidade, ${c[2]} parceiros na carteira"><i style="width:${Math.max(w,v?0.8:0)}%"></i></div><div class="mv">${txt}${t?`<span class="tag ${k}">${t}</span>`:''}</div></div>`}).join('');
+  $('#mnote').textContent={city:'Barras azuis: culinárias com parceiro na carteira. Laranja: sem parceiro na carteira.',par:'Número de restaurantes da carteira em cada culinária.',per:'Pedidos da cidade divididos pelos parceiros da carteira: acima de 10 mil indica espaço, abaixo de 2,5 mil indica disputa. Os cortes são uma regra de leitura, não um dado do case.'}[MM];
+}
+function renderMarketCards(){
+  const un=CITY.filter(c=>!c[2]),ut=sum(un,c=>c[1]);
+  $('#mcards').innerHTML=`
+   <div class="card"><h3>Espaço para crescer</h3><p class="hint" style="margin-top:6px">Açaí tem ${fmt(51106)} pedidos e 3 parceiros. Padaria tem ${fmt(11834)} pedidos e 1 parceiro. São as duas contas mais valiosas por restaurante: reforçar anúncios e promoções.</p></div>
+   <div class="card"><h3>Mercado disputado</h3><p class="hint" style="margin-top:6px">Pizza é a 3ª maior demanda e tem 27 parceiros, cerca de ${fmt(66198/27)} pedidos por restaurante. Ajudar cada loja a se diferenciar, sem guerra de preço.</p></div>
+   <div class="card"><h3>Sem cobertura na carteira</h3><p class="hint" style="margin-top:6px">${un.length} culinárias somam ${fmt(ut)} pedidos na cidade e nenhum parceiro na carteira. Marmita, Doces &amp; Bolos e Bebidas podem virar categorias novas no cardápio de quem já está na carteira. Mercado, Carnes e Conveniência são outro tipo de operação.</p></div>`;
+}
+
+/* ---- expansão ---- */
+function renderExp(){
+  const m=+$('#e1').value,t=+$('#e2').value,cv=+$('#e3').value,dd=+$('#e4').value;
+  $('#e1o').textContent=m;$('#e2o').textContent=t;$('#e3o').textContent=cv+'%';$('#e4o').textContent=dd;
+  const am=Math.ceil(m/(cv/100)-1e-9),at=Math.ceil(t/(cv/100)-1e-9),tot=am+at,perDay=tot/dd;
+  const box=(l,v,s)=>`<div class="card"><div class="hint">${l}</div><div class="big num">${v}</div><div class="hint">${s}</div></div>`;
+  $('#eflow').innerHTML=box('Abordagens de Maquinona',am,`para ${m} captações a ${cv}%`)+box('Abordagens de Totem',at,`para ${t} captações a ${cv}%`)+box('Total no mês',tot,`${m+t} captações no fim`)+box('Por dia útil',dec(perDay,1).replace(',0','')+'',perDay>3?'acima de 3 por dia, rotina apertada':'cabe na rotina de consultoria');
+}
+
+/* ---- navegação ---- */
+const TABS=['carteira','funil','mercado','expansao','postura'];
+function go(t,focus){
+  if(!TABS.includes(t))t='carteira';
+  TABS.forEach(k=>{$('#p-'+k).hidden=k!==t;$('#tab-'+k).setAttribute('aria-selected',k===t)});
+  try{history.replaceState(null,'','#'+t)}catch(e){}
+  scrollTo({top:0});
+  if(focus)$('#tab-'+t).focus({preventScroll:true});
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab]');if(t)return go(t.dataset.tab);
+  const g=e.target.closest('[data-go]');if(g)return go(g.dataset.go);
+  const f=e.target.closest('[data-f]');if(f){S.filter=f.dataset.f;renderFilters();renderTable();return}
+  const so=e.target.closest('[data-sort]');if(so){const k=so.dataset.sort;S.sort=S.sort.k===k?{k,d:-S.sort.d}:{k,d:k==='n'?1:(k==='g'?1:-1)};renderTable();return}
+  const m=e.target.closest('[data-m]');if(m){MM=m.dataset.m;renderMarket();return}
+  const p=e.target.closest('[data-p]');if(p){setPreset(+p.dataset.p);return}
+  const s=e.target.closest('[data-sel]');if(s){select(s.dataset.sel,true);}
+});
+document.addEventListener('keydown',e=>{
+  if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)&&e.target.type!=='range')return;
+  if(e.target.type==='range')return;
+  const cur=TABS.find(k=>!$('#p-'+k).hidden),i=TABS.indexOf(cur);
+  if(e.key==='ArrowRight'&&i<TABS.length-1)go(TABS[i+1],true);
+  if(e.key==='ArrowLeft'&&i>0)go(TABS[i-1],true);
+});
+$('#q').addEventListener('input',e=>{S.q=e.target.value;renderTable()});
+$('#dedup').addEventListener('change',e=>{S.dedup=e.target.checked;if(S.dedup&&MIRR.has(S.sel))S.sel=({M:'G',X:'S',AN:'AG',AQ:'AI'})[S.sel];updateAll()});
+['s1','s2','s3'].forEach(id=>$('#'+id).addEventListener('input',()=>{document.querySelectorAll('#presets button').forEach(b=>b.setAttribute('aria-pressed','false'));renderSim()}));
+['fa','fb'].forEach(id=>$('#'+id).addEventListener('input',renderFunWhat));
+['e1','e2','e3','e4'].forEach(id=>$('#'+id).addEventListener('input',renderExp));
+function updateAll(){renderKpis();renderAgenda();renderFilters();renderTable();renderFicha();renderSim()}
+updateAll();renderNotes();renderFunnel();renderFunWhat();renderMarket();renderMarketCards();renderExp();setPreset(1);
+go(location.hash.replace('#','')||'carteira');
+</script>
